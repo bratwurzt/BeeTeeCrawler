@@ -30,6 +30,7 @@ public class TorrentCrawler extends WebCrawler
   private static File storageFolder;
   private static String[] crawlDomains;
   private static BeeTeeMagnet m_parent;
+  private static Map<String, MagnetURI> m_crawlMap;
   private static int m_numOfMagnetsToRead;
 
   public static void configure(BeeTeeMagnet parent, String[] crawlDomains, String storageFolderName, int numOfMagnetsToRead)
@@ -37,7 +38,7 @@ public class TorrentCrawler extends WebCrawler
     m_parent = parent;
     m_numOfMagnetsToRead = numOfMagnetsToRead;
     TorrentCrawler.crawlDomains = crawlDomains;
-
+    m_crawlMap = new HashMap<String, MagnetURI>();
     storageFolder = new File(storageFolderName);
     if (!storageFolder.exists())
     {
@@ -98,13 +99,14 @@ public class TorrentCrawler extends WebCrawler
         if (!m_parent.getMagnetLinks().containsKey(magnet.getBtih())
             || m_parent.getMagnetLinks().get(magnet.getBtih()).getDisplayName().length() < magnet.getDisplayName().length())
         {
-          m_parent.getMagnetLinks().put(magnet.getBtih(), magnet);
+          m_crawlMap.put(magnet.getBtih(), magnet);
         }
       }
     }
 
-    if (m_parent.getMagnetLinks().size() >= m_numOfMagnetsToRead)
+    if (m_crawlMap.size() >= m_numOfMagnetsToRead)
     {
+      m_parent.getMagnetLinks().putAll(m_crawlMap);
       getMyController().shutdown();
     }
   }

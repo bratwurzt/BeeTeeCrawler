@@ -227,4 +227,21 @@ public class MagnetURI
   {
     m_leechers = leechers;
   }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    MagnetURI o = (MagnetURI) obj;
+    try
+    {
+      return getHref().equals(o.getHref());
+    }
+    catch (UnsupportedEncodingException e)
+    {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+
 }

@@ -27,11 +27,10 @@ public class BeeTeeMagnetsTable extends JTable
       @Override
       public void mouseClicked(MouseEvent e)
       {
-        int row = rowAtPoint(new Point(e.getX(), e.getY()));
-        int col = columnAtPoint(new Point(e.getX(), e.getY()));
-        if (BeeTeeMagnetsTableModel.COL_LINK == col)
+        int selectedColumn = getSelectedColumn();
+        if (BeeTeeMagnetsTableModel.COL_LINK == selectedColumn)
         {
-          String url = (String) getModel().getValueAt(row, col);
+          String url = (String) getModel().getValueAt(convertRowIndexToModel(getSelectedRow()), selectedColumn);
           try
           {
             URI magnetLinkUri = new URI(url);
@@ -53,7 +52,7 @@ public class BeeTeeMagnetsTable extends JTable
   private void initURISchemeHandler() throws CouldNotRegisterUriSchemeHandler
   {
     m_uriSchemeHandler = new URISchemeHandler();
-    m_uriSchemeHandler.register("magnet", "c:/windows/system32//notepad.exe");
+    m_uriSchemeHandler.register("magnet", "C:\\Program Files (x86)\\uTorrent\\uTorrent.exe");
   }
 
   public void setColumnWidths(int[] nRelativeColumnWidths)

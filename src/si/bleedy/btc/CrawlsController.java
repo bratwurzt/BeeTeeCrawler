@@ -35,15 +35,16 @@ public class CrawlsController
     bsConfig.setIncludeBinaryContentInCrawling(false);
     bsConfig.setResumableCrawling(false);
     PageFetcher bsPageFetcher = new PageFetcher(bsConfig);
-    RobotstxtServer robotstxtServer = new RobotstxtServer(new RobotstxtConfig(), bsPageFetcher);
+    RobotstxtServer bsRobotstxtServer = new RobotstxtServer(new RobotstxtConfig(), bsPageFetcher);
 
     BitsnoopMagnetCrawler.configure(m_parent, bitsnoopDomains, bsCrawlStorageFolder, m_numOfMagnetsToRead);
-    m_bsController = new CrawlController(bsConfig, bsPageFetcher, robotstxtServer);
+    m_bsController = new CrawlController(bsConfig, bsPageFetcher, bsRobotstxtServer);
     m_bsController.setCustomData(bitsnoopDomains);
     for (String domain : bitsnoopDomains)
     {
       m_bsController.addSeed(domain);
     }
+    m_bsController.addSeed("http://bitsnoop.com/browse");
 
     String[] piratebayDomains = new String[]{"http://thepiratebay.sx/"};
     String pbCrawlStorageFolder = m_rootFolder + "/piratebay";
@@ -52,9 +53,10 @@ public class CrawlsController
     pbConfig.setIncludeBinaryContentInCrawling(false);
     pbConfig.setResumableCrawling(false);
     PageFetcher pbPageFetcher = new PageFetcher(pbConfig);
+    RobotstxtServer pbRobotstxtServer = new RobotstxtServer(new RobotstxtConfig(), pbPageFetcher);
 
     PirateBayMagnetCrawler.configure(m_parent, piratebayDomains, pbCrawlStorageFolder, m_numOfMagnetsToRead);
-    m_pbController = new CrawlController(pbConfig, pbPageFetcher, robotstxtServer);
+    m_pbController = new CrawlController(pbConfig, pbPageFetcher, pbRobotstxtServer);
     m_pbController.setCustomData(piratebayDomains);
     for (String domain : piratebayDomains)
     {
@@ -65,7 +67,9 @@ public class CrawlsController
 
   public void start()
   {
-    m_bsController.start(BitsnoopMagnetCrawler.class, 2);
-    m_pbController.start(PirateBayMagnetCrawler.class, 2);
+    m_bsController.startNonBlocking(BitsnoopMagnetCrawler.class, 1);
+    m_pbController.startNonBlocking(PirateBayMagnetCrawler.class, 1);
+    m_bsController.waitUntilFinish();
+    m_pbController.waitUntilFinish();
   }
 }

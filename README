@@ -4,5 +4,4 @@ Dependant libraries:
 sqlitejdbc-v056.jar
 commons-io-2.4
 crawler4j-3.5
-InetAddressLocator-2.23
 jsoup-1.6.1

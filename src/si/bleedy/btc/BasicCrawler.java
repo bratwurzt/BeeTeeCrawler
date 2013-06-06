@@ -9,7 +9,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
 import java.util.List;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class BasicCrawler extends WebCrawler
 {

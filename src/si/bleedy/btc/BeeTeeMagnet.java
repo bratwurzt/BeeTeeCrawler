@@ -1,17 +1,47 @@
 package si.bleedy.btc;
 
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
+import javax.swing.table.TableRowSorter;
+
 import si.bleedy.btc.uriSchemeHandler.CouldNotRegisterUriSchemeHandler;
 
-import javax.swing.*;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.sql.SQLException;
-import java.util.*;
-
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class BeeTeeMagnet extends JFrame implements ActionListener
 {
@@ -27,14 +57,14 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
   public static int[] m_columnWidths = {80, 100, 20, 20, 100};
   private Map<String, MagnetURI> m_magnetLinks;
   private CrawlsController m_crawlsController;
-  private String[] m_crawlDomains = new String[]{"http://bitsnoop.com/"};
 
   public BeeTeeMagnet()
-      throws HeadlessException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException, CouldNotRegisterUriSchemeHandler
+      throws HeadlessException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException,
+      CouldNotRegisterUriSchemeHandler
   {
     super("BeeTee");
     UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-    m_magnetLinks = new HashMap<String, MagnetURI>();
+    m_magnetLinks = new ConcurrentHashMap<String, MagnetURI>();
     m_recentlyOpenedFiles = readRecentlyOpenedFiles();
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     addWindowListener(new WindowAdapter()
@@ -52,7 +82,7 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
   private void buildMenus()
   {
     m_fileChooser = new JFileChooser();
-//    m_fileChooser.addChoosableFileFilter(new DataFileFilter());
+    //    m_fileChooser.addChoosableFileFilter(new DataFileFilter());
     m_menuBar = new JMenuBar();
     m_mainMenu = new JMenu("File");
     m_mainMenu.setMnemonic(KeyEvent.VK_F);
@@ -82,19 +112,22 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
     m_submenu.setMnemonic(KeyEvent.VK_T);
     for (int i = 1; i <= 10; i++)
     {
-      m_menuItem = new JMenuItem(String.valueOf(i*100), KeyEvent.VK_2);
+      m_menuItem = new JMenuItem(String.valueOf(i * 100), KeyEvent.VK_2);
       m_menuItem.setActionCommand("MENU.CRAWL");
       m_menuItem.addActionListener(this);
       m_submenu.add(m_menuItem);
     }
-    m_menuItem = new JMenuItem("5000", KeyEvent.VK_2);
-    m_menuItem.setActionCommand("MENU.CRAWL");
-    m_menuItem.addActionListener(this);
-    m_submenu.add(m_menuItem);
+
     m_menuItem = new JMenuItem("10000", KeyEvent.VK_2);
     m_menuItem.setActionCommand("MENU.CRAWL");
     m_menuItem.addActionListener(this);
     m_submenu.add(m_menuItem);
+
+    m_menuItem = new JMenuItem("50000", KeyEvent.VK_2);
+    m_menuItem.setActionCommand("MENU.CRAWL");
+    m_menuItem.addActionListener(this);
+    m_submenu.add(m_menuItem);
+
     m_mainMenu.add(m_submenu);
   }
 
@@ -103,9 +136,9 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
     m_dataWorker = new DataWorker();
 
     setJMenuBar(m_menuBar);
-//    m_groupPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-//    m_groupPanel.setBorder(BorderFactory.createTitledBorder("Groups"));
-//    m_groupPanel.setPreferredSize(new Dimension(1100, 80));
+    //    m_groupPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    //    m_groupPanel.setBorder(BorderFactory.createTitledBorder("Groups"));
+    //    m_groupPanel.setPreferredSize(new Dimension(1100, 80));
 
     m_mainTable = new BeeTeeMagnetsTable(new BeeTeeMagnetsTableModel(m_magnetLinks));
     m_mainTable.setDefaultRenderer(String.class, new CellRenderer());
@@ -116,8 +149,8 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
 
     m_scrollPane = new JScrollPane(m_mainTable);
     JPanel panel = new JPanel(new GridBagLayout());
-//    panel.add(m_groupPanel,
-//        new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+    //    panel.add(m_groupPanel,
+    //        new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
     panel.add(m_scrollPane,
         new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
     panel.setOpaque(true);
@@ -205,7 +238,7 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
       setHoldCursor();
       try
       {
-        m_crawlsController = new CrawlsController(this, "C:/Temp/btc", "C:/Temp/btc/storage", numOfPostsToRead, m_crawlDomains);
+        m_crawlsController = new CrawlsController(this, "C:/Temp/btc", numOfPostsToRead);
         m_crawlsController.start();
         refreshTableModel();
       }
@@ -232,7 +265,7 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
       {
         FileInputStream fis = new FileInputStream(file);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        list = (TreeSet) ois.readObject();
+        list = (TreeSet)ois.readObject();
         ois.close();
         fis.close();
       }
@@ -325,7 +358,7 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
     m_mainTable.setModel(model);
     m_sorter.setModel(model);
     m_mainTable.setColumnWidths(m_columnWidths);
-//    m_mainTable.resetGroupFilters();
+    //    m_mainTable.resetGroupFilters();
     this.pack();
   }
 
@@ -360,6 +393,5 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
     {
       couldNotRegisterUriSchemeHandler.printStackTrace();
     }
-
   }
 }

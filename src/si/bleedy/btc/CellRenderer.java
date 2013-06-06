@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class CellRenderer extends JEditorPane implements TableCellRenderer
 {

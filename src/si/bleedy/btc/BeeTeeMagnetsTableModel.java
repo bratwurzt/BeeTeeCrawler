@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class BeeTeeMagnetsTableModel extends AbstractTableModel
 {

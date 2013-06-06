@@ -1,69 +1,36 @@
-package si.bleedy.btc;
+package si.bleedy.btc.crawlers;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
-import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
-import edu.uci.ics.crawler4j.url.WebURL;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import si.bleedy.btc.BeeTeeMagnet;
+import si.bleedy.btc.MagnetURI;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
-public class TorrentCrawler extends WebCrawler
+public class BitsnoopMagnetCrawler extends TorrentCrawler
 {
-  private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g|png|tiff?|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-
-  private static File storageFolder;
-  private static String[] crawlDomains;
-  private static BeeTeeMagnet m_parent;
-  private static Map<String, MagnetURI> m_crawlMap;
-  private static int m_numOfMagnetsToRead;
+  protected static Map<String, MagnetURI> m_crawlMap;
 
   public static void configure(BeeTeeMagnet parent, String[] crawlDomains, String storageFolderName, int numOfMagnetsToRead)
   {
     m_parent = parent;
     m_numOfMagnetsToRead = numOfMagnetsToRead;
-    TorrentCrawler.crawlDomains = crawlDomains;
+    PirateBayMagnetCrawler.crawlDomains = crawlDomains;
     m_crawlMap = new HashMap<String, MagnetURI>();
     storageFolder = new File(storageFolderName);
     if (!storageFolder.exists())
     {
       storageFolder.mkdirs();
     }
-  }
-
-  @Override
-  public boolean shouldVisit(WebURL url)
-  {
-    String href = url.getURL().toLowerCase();
-
-    if (FILTERS.matcher(href).matches())
-    {
-      return false;
-    }
-
-    for (String domain : crawlDomains)
-    {
-      if (href.startsWith(domain))
-      {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override

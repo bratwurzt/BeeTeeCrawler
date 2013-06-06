@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class DataWorker
 {

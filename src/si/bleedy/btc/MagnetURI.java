@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class MagnetURI
 {

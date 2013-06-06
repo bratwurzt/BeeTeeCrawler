@@ -7,7 +7,7 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 /**
- * @author DusanM
+ * @author bratwurzt
  */
 public class BasicCrawlController
 {

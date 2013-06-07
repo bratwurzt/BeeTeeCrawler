@@ -1,6 +1,7 @@
 package si.bleedy.btc.crawlers;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -14,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import si.bleedy.btc.BeeTeeMagnet;
+import si.bleedy.btc.DataWorker;
 import si.bleedy.btc.MagnetURI;
 
 /**
@@ -21,10 +23,9 @@ import si.bleedy.btc.MagnetURI;
  */
 public class PirateBayMagnetCrawler extends WebCrawler
 {
-  protected static Map<String, MagnetURI> m_crawlMap;
   private final static Pattern FILTERS =
       Pattern.compile(".*(\\.(txt|css|js|bmp|gif|jpe?g|png|tiff?|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-
+  protected static int m_currentSize;
   protected static File storageFolder;
   protected static String[] crawlDomains;
   protected static BeeTeeMagnet m_parent;
@@ -55,7 +56,7 @@ public class PirateBayMagnetCrawler extends WebCrawler
     m_parent = parent;
     m_numOfMagnetsToRead = numOfMagnetsToRead;
     PirateBayMagnetCrawler.crawlDomains = crawlDomains;
-    m_crawlMap = new HashMap<String, MagnetURI>();
+    m_currentSize = 0;
     storageFolder = new File(storageFolderName);
     if (!storageFolder.exists())
     {
@@ -82,39 +83,46 @@ public class PirateBayMagnetCrawler extends WebCrawler
       for (Element link : links)
       {
         String magnetLink = link.attr("href");
-        MagnetURI magnet = new MagnetURI(magnetLink);
+        MagnetURI magnet = new MagnetURI(magnetLink, "piratebay.sx");
         Elements areSearchResults = doc.select("table#searchResult");
         if (areSearchResults.size() > 0)
         {
           Elements seedPeer = link.parents().select("> td[align=right]");
           Element seeders = seedPeer.first();
           Element leechers = seedPeer.last();
-          if (seeders != null)
+          try
           {
-            magnet.setSeeders(seeders.text());
+            if (seeders != null)
+            {
+              magnet.setSeeders(DataWorker.getNumberFormat().parse(seeders.text()).intValue());
+            }
+            if (leechers != null)
+            {
+              magnet.setLeechers(DataWorker.getNumberFormat().parse(leechers.text()).intValue());
+            }
+          }
+          catch (ParseException e)
+          {
+            e.printStackTrace();
+          }
+
+          MagnetURI oldMagnet = m_parent.getMagnetLinks().putIfAbsent(magnet.getBtih(), magnet);
+          if (oldMagnet != null)
+          {
+            if (oldMagnet.getSeeders() > magnet.getSeeders() && magnet.getSeeders() > 0)
+            {
+              m_parent.getMagnetLinks().put(magnet.getBtih(), magnet);
+            }
           }
           else
           {
-            System.out.println();
-          }
-          if (leechers != null)
-          {
-            magnet.setLeechers(leechers.text());
-          }
-          else
-          {
-            System.out.println();
-          }
-          if (!m_parent.getMagnetLinks().containsKey(magnet.getBtih()) && !m_crawlMap.containsKey(magnet.getBtih()))
-          {
-            m_crawlMap.put(magnet.getBtih(), magnet);
+            m_currentSize++;
           }
         }
       }
 
-      if (m_crawlMap.size() >= m_numOfMagnetsToRead)
+      if (m_currentSize >= m_numOfMagnetsToRead)
       {
-        m_parent.getMagnetLinks().putAll(m_crawlMap);
         getMyController().shutdown();
       }
     }

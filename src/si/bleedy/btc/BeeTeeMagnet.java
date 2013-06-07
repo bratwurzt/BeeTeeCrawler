@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -54,8 +55,8 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
   private BeeTeeMagnetsTable m_mainTable;
   private JScrollPane m_scrollPane;
   private TreeSet m_recentlyOpenedFiles;
-  public static int[] m_columnWidths = {80, 100, 20, 20, 100};
-  private Map<String, MagnetURI> m_magnetLinks;
+  public static int[] m_columnWidths = {80, 100, 20, 20, 40, 40};
+  private ConcurrentHashMap<String, MagnetURI> m_magnetLinks;
   private CrawlsController m_crawlsController;
 
   public BeeTeeMagnet()
@@ -186,6 +187,10 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
           {
             e1.printStackTrace();
           }
+          catch (ParseException e1)
+          {
+            e1.printStackTrace();
+          }
           finally
           {
             resetCursor();
@@ -206,7 +211,7 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
     }
     else if (action.equals("MENU.CLOSE"))
     {
-      m_magnetLinks = new HashMap<String, MagnetURI>();
+      m_magnetLinks = new ConcurrentHashMap<String, MagnetURI>();
       refreshTableModel();
     }
     else if (action.equals("MENU.RECENT"))
@@ -221,6 +226,10 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
           m_magnetLinks = m_dataWorker.readBeeTeeDB();
         }
         catch (SQLException e1)
+        {
+          e1.printStackTrace();
+        }
+        catch (ParseException e1)
         {
           e1.printStackTrace();
         }
@@ -362,7 +371,7 @@ public class BeeTeeMagnet extends JFrame implements ActionListener
     this.pack();
   }
 
-  public Map<String, MagnetURI> getMagnetLinks()
+  public ConcurrentHashMap<String, MagnetURI> getMagnetLinks()
   {
     return m_magnetLinks;
   }

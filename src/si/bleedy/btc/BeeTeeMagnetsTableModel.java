@@ -19,7 +19,8 @@ public class BeeTeeMagnetsTableModel extends AbstractTableModel
   public static final int COL_SEED = 2;
   public static final int COL_LEECH = 3;
   public static final int COL_LINK = 4;
-  protected static final int COLUMN_COUNT = 5;
+  public static final int COL_SOURCE = 5;
+  protected static final int COLUMN_COUNT = 6;
   protected NumberFormat m_numberFormat;
 
   protected List<MagnetURI> m_entityList;
@@ -59,6 +60,9 @@ public class BeeTeeMagnetsTableModel extends AbstractTableModel
       case COL_LINK:
         return "Link";
 
+      case COL_SOURCE:
+        return "Source page";
+
       default:
         return "?";
     }
@@ -71,6 +75,7 @@ public class BeeTeeMagnetsTableModel extends AbstractTableModel
       case COL_HASH:
       case COL_TITLE:
       case COL_LINK:
+      case COL_SOURCE:
         return String.class;
 
       case COL_SEED:
@@ -96,21 +101,20 @@ public class BeeTeeMagnetsTableModel extends AbstractTableModel
           return magnetLink.getDisplayName();
 
         case COL_SEED:
-          return magnetLink.getSeeders() == null ? 0 : m_numberFormat.parse(magnetLink.getSeeders()).intValue();
+          return magnetLink.getSeeders();
 
         case COL_LEECH:
-          return magnetLink.getLeechers() == null ? 0 : m_numberFormat.parse(magnetLink.getLeechers()).intValue();
+          return magnetLink.getLeechers();
 
         case COL_LINK:
             return magnetLink.getHref();
 
+        case COL_SOURCE:
+            return magnetLink.getSourcePage();
+
         default:
           return "damn you, sky!";
       }
-    }
-    catch (ParseException e)
-    {
-      e.printStackTrace();
     }
     catch (UnsupportedEncodingException e)
     {

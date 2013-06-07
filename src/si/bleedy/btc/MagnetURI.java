@@ -21,19 +21,21 @@ public class MagnetURI
   private String m_keywordTopic;
   private String m_manifestTopic;
   private String m_displayName;
-  private String m_seeders;
-  private String m_leechers;
+  private int m_seeders;
+  private int m_leechers;
+  private String m_sourcePage;
 
-  public MagnetURI(final String btih, final String displayName, final String addressTracker, final String seeders, final String leechers)
+  public MagnetURI(final String btih, final String displayName, final String addressTracker, final int seeders, final int leechers, final String sourcePage)
   {
     m_btih = btih;
     m_displayName = displayName;
     setAddressTrackerList(addressTracker);
     m_seeders = seeders;
     m_leechers = leechers;
+    m_sourcePage = sourcePage;
   }
 
-  public MagnetURI(String magnetLink)
+  public MagnetURI(String magnetLink, String sourcePage)
   {
     StringTokenizer st, keyPair;
     magnetLink = magnetLink.substring("magnet:?".length());
@@ -56,6 +58,7 @@ public class MagnetURI
         }
       }
     }
+    m_sourcePage = sourcePage;
   }
 
   private void setParameter(final String key, final String val) throws UnsupportedEncodingException
@@ -208,24 +211,29 @@ public class MagnetURI
     return m_displayName;
   }
 
-  public String getSeeders()
+  public int getSeeders()
   {
     return m_seeders;
   }
 
-  public void setSeeders(String seeders)
+  public void setSeeders(int seeders)
   {
     m_seeders = seeders;
   }
 
-  public String getLeechers()
+  public int getLeechers()
   {
     return m_leechers;
   }
 
-  public void setLeechers(String leechers)
+  public void setLeechers(int leechers)
   {
     m_leechers = leechers;
+  }
+
+  public String getSourcePage()
+  {
+    return m_sourcePage;
   }
 
   @Override
@@ -242,6 +250,4 @@ public class MagnetURI
     }
     return false;
   }
-
-
 }

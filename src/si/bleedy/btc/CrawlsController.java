@@ -46,7 +46,7 @@ public class CrawlsController
     }
     m_bsController.addSeed("http://bitsnoop.com/browse");
 
-    String[] piratebayDomains = new String[]{"http://thepiratebay.sx/"};
+    String[] piratebayDomains = new String[]{"http://thepiratebay.se/"};
     String pbCrawlStorageFolder = m_rootFolder + "/piratebay";
     CrawlConfig pbConfig = new CrawlConfig();
     pbConfig.setCrawlStorageFolder(pbCrawlStorageFolder);
@@ -62,14 +62,14 @@ public class CrawlsController
     {
       m_pbController.addSeed(domain);
     }
-    m_pbController.addSeed("http://thepiratebay.sx/search/");
+    m_pbController.addSeed("http://thepiratebay.se/search/");
   }
 
   public void start()
   {
     m_bsController.startNonBlocking(BitsnoopMagnetCrawler.class, 1);
-    m_pbController.startNonBlocking(PirateBayMagnetCrawler.class, 1);
+//    m_pbController.startNonBlocking(PirateBayMagnetCrawler.class, 1);
     m_bsController.waitUntilFinish();
-    m_pbController.waitUntilFinish();
+//    m_pbController.waitUntilFinish();
   }
 }

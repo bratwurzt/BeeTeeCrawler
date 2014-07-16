@@ -79,7 +79,7 @@ public class BasicCrawlController
          * which are found in these pages
          */
 
-    controller.addSeed("https://thepiratebay.sx/browse/601/");
+    controller.addSeed("https://thepiratebay.se/browse/601/");
 
     /*
          * Start the crawl. This is a blocking operation, meaning that your code
